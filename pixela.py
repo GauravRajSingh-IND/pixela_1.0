@@ -92,4 +92,28 @@ class Pixela:
             except requests.RequestException as e:
                 return {"error": e}
 
+        def delete_account(self, username:str, token:str) -> dict:
+            """
+            This function let user delete there account by providing a valid username and token/password.
+            :param username: username of the account which user wants to delete.
+            :param token: token/password of the account which user wants to delete.
+            :return: dictionary which have information about if the user account is deleted or not.
+            """
+
+            self.username_text = username
+            self.password_text = token
+
+            url = f"{Pixela().end_point}/v1/users/{self.username_text}"
+
+            headers = {
+                "X-USER-TOKEN":self.password_text
+            }
+
+            # request to delete the user account.
+            try:
+                response = requests.delete(url=url, headers=headers)
+                response.raise_for_status()
+                return {"username":self.username_text, "response":response.json()}
+            except requests.RequestException as e:
+                return {"error": e}
 

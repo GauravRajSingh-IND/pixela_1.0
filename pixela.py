@@ -1,5 +1,11 @@
 import requests
 
+"""
+{'username': 'gauravrajsinghjobner101', 'token': 'grsmanohar007', 
+'response': {'message': "Success. Let's visit https://pixe.la/@gauravrajsinghjobner101 , 
+it is your profile page!", 'isSuccess': True}}
+"""
+
 class Pixela:
 
     def __init__(self):
@@ -49,5 +55,41 @@ class Pixela:
                 print(f"error while creating the user: {e}")
                 return {"error": e}
 
+        def update_user_password(self, username:str, token:str, new_token:str) -> dict:
+            """
+            this function update the token/password of an existing user.
+            :param username: username of the user
+            :param token: current token of the user
+            :param new_token: new token of the user
+            :return: dict object containing information if the password is updated or not.
+            """
+
+            # assigning username.
+            self.username_text = username
+            self.password_text = token
+
+            url = f"{Pixela().end_point}/v1/users/{self.username_text}"
+
+            headers = {
+                "X-USER-TOKEN":self.password_text,
+            }
+
+            params = {
+                "newToken":new_token
+            }
+
+            # create a put request to change the user password.
+            try:
+                response = requests.put(url=url, json=params, headers=headers)
+                response.raise_for_status()
+
+                # assign new token to password variable.
+                self.password_text = new_token
+
+                return {"username": self.username_text, "token": self.password_text,
+                        "response": response.json()}
+
+            except requests.RequestException as e:
+                return {"error": e}
 
 

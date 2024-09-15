@@ -117,3 +117,23 @@ class Pixela:
             except requests.RequestException as e:
                 return {"error": e}
 
+        def view_user_profile(self, username:str) -> dict:
+            """
+            This function will give html data of the user.
+            :param username: username
+            :return: dict object
+            """
+
+            self.username_text = username
+
+            url = f"{Pixela().end_point}/@{self.username_text}"
+
+            try:
+                response =  requests.get(url)
+                response.raise_for_status()
+                return {"status":True, "response":response.text}
+
+            except requests.RequestException as e:
+                return {"status":False, "response":f"Error while fetching user profile: {e}"}
+
+

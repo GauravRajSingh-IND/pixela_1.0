@@ -6,11 +6,12 @@ import requests
 'isSuccess': True}}
 """
 
+END_POINT = "https://pixe.la"
+
 class Pixela:
 
     def __init__(self):
 
-        self.end_point = "https://pixe.la"
         self.USER = self.User()
 
     class User:
@@ -31,7 +32,7 @@ class Pixela:
                     information about the error
             """
 
-            url = f"{Pixela().end_point}/v1/users"
+            url = f"{END_POINT}/v1/users"
 
             params = {
                 "token":token,
@@ -68,7 +69,7 @@ class Pixela:
             self.username_text = username
             self.password_text = token
 
-            url = f"{Pixela().end_point}/v1/users/{self.username_text}"
+            url = f"{END_POINT}/v1/users/{self.username_text}"
 
             headers = {
                 "X-USER-TOKEN":self.password_text,
@@ -103,7 +104,7 @@ class Pixela:
             self.username_text = username
             self.password_text = token
 
-            url = f"{Pixela().end_point}/v1/users/{self.username_text}"
+            url = f"{END}/v1/users/{self.username_text}"
 
             headers = {
                 "X-USER-TOKEN":self.password_text
@@ -126,7 +127,7 @@ class Pixela:
 
             self.username_text = username
 
-            url = f"{Pixela().end_point}/@{self.username_text}"
+            url = f"{END_POINT}/@{self.username_text}"
 
             try:
                 response =  requests.get(url)
@@ -160,7 +161,7 @@ class Pixela:
             self.username_text = username
             self.password_text = token
 
-            url = f"{Pixela().end_point}/@{self.username_text}"
+            url = f"{END_POINT}/@{self.username_text}"
 
             headers = {
                 "X-USER-TOKEN":token
@@ -185,3 +186,72 @@ class Pixela:
             except requests.RequestException as e:
                 return {"status": False, "response": e}
 
+    class Graph:
+
+        def __init__(self):
+            self.username_text = None
+            self.password_text = None
+
+        def create_graph(self, username:str, token:str, id:str, name:str, unit:str, type:str, color:str,
+                         timezone:str = None, selfSufficient:str = None, isSecret:str = False,
+                         publishOptionalData:str = False) -> dict:
+            """
+            Create a new pixelation graph definition.
+            :param username: username of the user
+            :param token: password/token
+            :param id: It is an ID for identifying the pixelation graph. Validation rule: ^[a-z][a-z0-9-]{1,16}
+            :param name: It is the name of the pixelation graph.
+            :param unit: It is a unit of the quantity recorded in the pixelation graph. Ex. commit, kilogram, calory.
+            :param type: It is the type of quantity to be handled in the graph. Only int or float are supported.
+            :param color: Defines the display color of the pixel in the pixelation graph., shibafu (green), momiji (red), sora (blue), ichou (yellow), ajisai (purple) and kuro (black)
+            :param timezone: Specify the time zone for this graph as TZ database name (not Time zone abbreviation).
+            :param selfSufficient: If SVG graph with this field increment or decrement is referenced, Pixel of this graph itself will be incremented or decremented.
+            :param isSecret: Graphs with this property's value true are not displayed on the graph list page and can be kept secret.
+            :param publishOptionalData: If this property is true, each pixel's optionalData will be added to the generated SVG data as a data-optional attribute.
+            :return: dict object, keys status, response.
+            """
+
+            if not all([username, token, id, name, unit, type, color]):
+                raise "Missing required parameters, Please try again"
+
+            self.username_text = username
+            self.password_text = token
+
+            url = f"{END_POINT}/v1/users/{self.username_text}/graphs"
+
+            headers = {
+                "X-USER-TOKEN":self.password_text
+            }
+
+            params = {
+                "id":id,
+                "name":name,
+                "unit":unit,
+                "type":type,
+                "color":color,
+                "timezone":timezone,
+                "selfSufficient":selfSufficient,
+                "isSecret":isSecret,
+                "publishOptionalData":publishOptionalData
+            }
+
+            try:
+                response = requests.post(url=url, json=params, headers=headers)
+                response.raise_for_status()
+                return {"status":True, "response":response.json()}
+
+            except requests.RequestException as e:
+                return {"status":False, "response":e}
+
+
+p = Pixela()
+response = p.Graph().create_graph("dyodhi", "grsmanohar", "pythonlearning", "python Learning 2023",
+                       "Hours", "float", "sora")
+print(response)
+
+
+"""
+{'username': 'dyodhi', 'token': 'grsmanohar', 
+'response': {'message': "Success. Let's visit https://pixe.la/@dyodhi , it is your profile page!", 
+'isSuccess': True}}
+"""

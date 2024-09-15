@@ -1,9 +1,9 @@
 import requests
 
 """
-{'username': 'gauravrajsinghjobner101', 'token': 'grsmanohar007', 
-'response': {'message': "Success. Let's visit https://pixe.la/@gauravrajsinghjobner101 , 
-it is your profile page!", 'isSuccess': True}}
+{'username': 'dyodhi', 'token': 'grsmanohar', 
+'response': {'message': "Success. Let's visit https://pixe.la/@dyodhi , it is your profile page!", 
+'isSuccess': True}}
 """
 
 class Pixela:
@@ -136,4 +136,52 @@ class Pixela:
             except requests.RequestException as e:
                 return {"status":False, "response":f"Error while fetching user profile: {e}"}
 
+        def update_user_profile(self, username:str, token:str, displayName:str = None, gravatarIconEmail:str = None,
+                                title:str = None, timezone:str = None, aboutURL:str = None, contributeURLs:str = None,
+                                pinnedGraphID:str = None) -> dict:
+
+            """
+            This function update the information provided by the user.
+            :param username: username of profile where update is required.
+            :param token: token ID of the profile.
+            :param displayName: The user's name for the display
+            :param gravatarIconEmail:  This is the email address registered as an icon in Gravatar.
+            :param title: The title of the user.
+            :param timezone: Specify the user's time zone as TZ database name (not Time zone abbreviation).
+            :param aboutURL: Users can only show one external link to this profile page.
+            :param contributeURLs: It corresponds to 6 in the image above.
+            :param pinnedGraphID: Users can pin one of their own graphs to their profile page.
+            :return: dict object of status and response.
+            """
+
+            if not all([username, token]):
+                raise "required values are missing, Please provide username and token"
+
+            self.username_text = username
+            self.password_text = token
+
+            url = f"{Pixela().end_point}/@{self.username_text}"
+
+            headers = {
+                "X-USER-TOKEN":token
+            }
+
+            params_keys = ['displayName', 'gravatarIconEmail', 'title', 'timezone', 'aboutURL', 'contributeURLs', 'pinnedGraphID']
+            params_values= [displayName, gravatarIconEmail, title, timezone, aboutURL, contributeURLs, pinnedGraphID]
+
+            params = {}
+            for num in range(len(params_keys)):
+
+                if params_values[num]  is not None:
+                    key = params_keys[num]
+
+                    # add params key and value to params dict.
+                    params[key] = params_values[num]
+
+            try:
+                response = requests.put(url=url, json=params, headers=headers)
+                response.raise_for_status()
+                return {"status": True, "response": response.json()}
+            except requests.RequestException as e:
+                return {"status": False, "response": e}
 
